@@ -1,4 +1,4 @@
-import { posts, validatePost } from "../data/posts.js";
+import { posts, validatePost, filterPosts } from "../data/posts.js";
 
 const postsController = {
     index,
@@ -10,11 +10,18 @@ const postsController = {
 }
 
 function index(request, response) {
+    const filteredPosts = filterPosts(request.query);
 
+    if(filteredPosts.length === 0){
+        return response.status(404).json({
+            error: "Non abbiamo post che rispettino le tue query",
+            result: []
+        });
+    }
     response.json(
         {
             error: null,
-            result: [posts]
+            result: filteredPosts
         }
     )
 
@@ -83,7 +90,7 @@ function modify(request, response) {
 function destroy(request, response) {
 
     const idReal = Number(request.params.id);
-    
+
     if(isNaN(idReal) || idReal <= 0){
         return response.status(400).json({
             error:"L'id inserito non è nel formato corretto. Deve essere un numero intero positivo",

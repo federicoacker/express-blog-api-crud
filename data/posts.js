@@ -64,70 +64,112 @@ const posts = [
   },
 ];
 
-function validatePost (post){
-    if(!post){
-        return null;
-    }
-    if(
-      !post.hasOwnProperty("title") || 
-      !post.hasOwnProperty("content") || 
-      !post.hasOwnProperty("image") || 
-      !post.hasOwnProperty("tags") || 
-      !post.hasOwnProperty("slug") ||
-      !post.hasOwnProperty("published") ||
-      !post.hasOwnProperty("prep_time") ||
-      !post.hasOwnProperty("created_at")){
-        return null;
-    } 
+function validatePost(post) {
+  if (!post) {
+    return null;
+  }
+  if (
+    !post.hasOwnProperty("title") ||
+    !post.hasOwnProperty("content") ||
+    !post.hasOwnProperty("image") ||
+    !post.hasOwnProperty("tags") ||
+    !post.hasOwnProperty("slug") ||
+    !post.hasOwnProperty("published") ||
+    !post.hasOwnProperty("prep_time") ||
+    !post.hasOwnProperty("created_at")) {
+    return null;
+  }
 
-    for(const property of Object.entries(post)){
-      switch(property[0]){
-        case "title":
-          if( typeof property[1] !== "string" || property[1].trim().length === 0 ){
-            return null;
-          }
-          break;
-        case "content":
-          if( typeof property[1] !== "string" || property[1].trim().length === 0 ){
-            return null;
-          }
-          break;
-        case "image":
-          if( typeof property[1] !== "string"){
-            return null;
-          }
-          break;
-        case "tags":
-          if( !Array.isArray(property[1]) ){
-            return null;
-          }
-          break;
-        case "slug":
-          if( typeof property[1] !== "string"){
-            return null;
-          }
-          break;
-        case "published":
-          if( typeof property[1] !== "boolean"){
-            return null;
-          }
-          break;
-        case "prep_time":
-          if( typeof property[1] !== "number"){
-            return null;
-          }
-          break;
-        case "created_at":
-          if( typeof property[1] !== "string" || property[1].trim().length === 0){
-            return null;
-          }
-          break;
+  for (const property of Object.entries(post)) {
+    switch (property[0]) {
+      case "title":
+        if (typeof property[1] !== "string" || property[1].trim().length === 0) {
+          return null;
+        }
+        break;
+      case "content":
+        if (typeof property[1] !== "string" || property[1].trim().length === 0) {
+          return null;
+        }
+        break;
+      case "image":
+        if (typeof property[1] !== "string") {
+          return null;
+        }
+        break;
+      case "tags":
+        if (!Array.isArray(property[1])) {
+          return null;
+        }
+        break;
+      case "slug":
+        if (typeof property[1] !== "string") {
+          return null;
+        }
+        break;
+      case "published":
+        if (typeof property[1] !== "boolean") {
+          return null;
+        }
+        break;
+      case "prep_time":
+        if (typeof property[1] !== "number") {
+          return null;
+        }
+        break;
+      case "created_at":
+        if (typeof property[1] !== "string" || property[1].trim().length === 0) {
+          return null;
+        }
+        break;
+    }
+  }
+
+  return post;
+}
+
+function filterPosts(query) {
+  const { title, tags, slug, prep_time } = query;
+
+  const filteredPosts = posts.filter(post => {
+    if (title) {
+      const postTitle = post.title.toLowerCase();
+      const searchTitle = title.toLowerCase();
+      if (!postTitle.startsWith(searchTitle)) {
+        return false;
       }
     }
+    if (slug) {
+      const postSlug = post.slug.toLowerCase();
+      const searchSlug = slug.toLowerCase();
+      if (!postSlug.startsWith(searchSlug)) {
+        return false;
+      }
+    }
+    if (prep_time) {
+      const postPrepTime = post.prep_time;
+      if (prep_time > postPrepTime) {
+        return false;
+      }
+    }
+    if (tags) {
+      const fixedPostTagArray = post.tags.map(tag => tag.toLowerCase());
+      const tagArray = tags.split(" ");
+      for (let i = 0; i < tagArray.length; i++) {
+        const currentSearchTag = tagArray[i].toLowerCase();
+        if (!fixedPostTagArray.includes(currentSearchTag)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  });
 
-    return post;
+  return filteredPosts;
 }
+
 export {
-    posts,
-    validatePost
+  posts,
+  validatePost,
+  filterPosts
 }
