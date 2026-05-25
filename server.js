@@ -6,6 +6,7 @@ const SERVER_URL = process.env.SERVER_URL;
 const SERVER_PORT = process.env.SERVER_PORT;
 
 app.use("/posts", postsRouter)
+app.use(express.static("public"));
 
 app.listen(SERVER_PORT, (error)=>{
     if(error){
