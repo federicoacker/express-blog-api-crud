@@ -83,12 +83,18 @@ function validatePost(post) {
   for (const property of Object.entries(post)) {
     switch (property[0]) {
       case "title":
-        if (typeof property[1] !== "string" || property[1].trim().length === 0) {
+        if (
+          typeof property[1] !== "string" ||
+          property[1].trim().length === 0
+        ) {
           return null;
         }
         break;
       case "content":
-        if (typeof property[1] !== "string" || property[1].trim().length === 0) {
+        if (
+          typeof property[1] !== "string" ||
+          property[1].trim().length === 0
+        ) {
           return null;
         }
         break;
@@ -118,10 +124,11 @@ function validatePost(post) {
         }
         break;
       case "created_at":
-        if (typeof property[1] !== "string" || property[1].trim().length === 0) {
-          return null;
-        }
-        if (isNaN(Date.parse(property[1]))){
+        if (
+          typeof property[1] !== "string" ||
+          property[1].trim().length === 0 ||
+          isNaN(Date.parse(property[1]))
+        ) {
           return null;
         }
         break;
