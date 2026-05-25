@@ -121,6 +121,9 @@ function validatePost(post) {
         if (typeof property[1] !== "string" || property[1].trim().length === 0) {
           return null;
         }
+        if (isNaN(Date.parse(property[1]))){
+          return null;
+        }
         break;
     }
   }

@@ -57,7 +57,7 @@ function show(request, response) {
 function store(request, response) {
     const objectReceived = request.body;
     const validatedObject = validatePost(objectReceived);
-    
+
     if (!validatedObject) {
         return response.status(400).json({
             error: "Oggetto invalido passato al server",
@@ -72,7 +72,7 @@ function store(request, response) {
 
     response.status(201).json({
         error: null,
-        result: posts
+        result: validatedObject
     })
 }
 
