@@ -1,4 +1,4 @@
-import { blogPosts, validatePost } from "../data/blogPosts.js";
+import { posts, validatePost } from "../data/posts.js";
 
 const postsController = {
     index,
@@ -14,7 +14,7 @@ function index(request, response) {
     response.json(
         {
             error: null,
-            result: [blogPosts]
+            result: [posts]
         }
     )
 
@@ -31,7 +31,7 @@ function show(request, response) {
         });
     }
 
-    const foundPost = blogPosts.find(post => post.id === convertedId);
+    const foundPost = posts.find(post => post.id === convertedId);
 
     if (!foundPost) {
         return response.status(404).json({
@@ -56,13 +56,13 @@ function store(request, response) {
             result: []
         })
     }
-    blogPosts.push({
+    posts.push({
         ...validatedObject,
-        id: blogPosts.length + 1
+        id: posts.length + 1
     });
     response.status(201).json({
         error: null,
-        result: blogPosts
+        result: posts
     })
 }
 
