@@ -82,10 +82,48 @@ function store(request, response) {
 }
 
 function update(request, response) {
-    const updateReceived = request.body;
+    const updateReceived = request.body; // E' una put, quindi mi aspetto di ricevere TUTTI i dati, per modificare quello che già ho con i dati nuovi.
+    const validatedUpdate = validatePost(updateReceived);
+    const id = request.params.id;
+    const convertedId = Number(id);
+    
+    if(!validatedUpdate){
+    return response.status(400).json({
+            error:"Oggetto invalido passato al server per la PUT, non è che volevi fare la PATCH?",
+            result: []
+        })
+    }
+
+    if (isNaN(convertedId) || convertedId < 0) {
+        return response.status(400).json({
+            error: "L'id inserito non è in un formato valido",
+            result: []
+        });
+    }
+    
+    const foundPostIndex = posts.findIndex(post => post.id === convertedId);
+
+    if (foundPostIndex === -1) {
+        return response.status(404).json({
+            error: "Non abbiamo trovato nessun post con quell'id",
+            result: []
+        })
+    }
+    
+    
+    const newPost = ({
+        ...posts[foundPostIndex],
+        ...validatedUpdate,
+        created_at: getCreationTime()
+    })
+
+    newPost.slug = createPostSlug(newPost);
+
+    posts.splice(foundPostIndex, 1 , newPost);
+
     response.json({
         error:null,
-        result: "Bravo hai fatto una put"
+        result: newPost
     })
 }
 
