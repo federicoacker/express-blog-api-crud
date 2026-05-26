@@ -108,7 +108,7 @@ function doPostsHaveSameKeys(...postObjects){ // devo ricordarmi di dare sempre 
   const allKeys = postObjects.reduce((keys, post) => {
     const currentKeys = Object.keys(post);
     return keys.concat(currentKeys);
-  }); // Alla fine di tutto questo, avrò un array con dentro tutte le chiavi di tutti i post ricevuti in ingresso
+  }, []); // Alla fine di tutto questo, avrò un array con dentro tutte le chiavi di tutti i post ricevuti in ingresso
   // Adesso devo eliminare tutti i duplicati da questo array:
   const deDuplicatedKeys = new Set(allKeys);
   // A questo punto, mi basta controllare che la lunghezza del mio set sia uguale alla lunghezza dell'array di chiavi di OGNI oggetto.
@@ -120,7 +120,9 @@ function validatePost(post) {
     return null;
   }
 
-
+  if (!doPostsHaveSameKeys(post, templatePostToBeCreated)){
+    return null;
+  }
 
   if (
     !post.hasOwnProperty("title") ||
