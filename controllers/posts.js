@@ -1,4 +1,4 @@
-import { posts, validatePost, filterPosts, createPostSlug, getCreationTime } from "../data/posts.js";
+import { posts, validatePostAndPut, filterPosts, createPostSlug, getCreationTime, validatePatch } from "../data/posts.js";
 
 const postsController = {
     index,
@@ -56,7 +56,7 @@ function show(request, response) {
 
 function store(request, response) {
     const postReceived = request.body;
-    const validatedPost = validatePost(postReceived);
+    const validatedPost = validatePostAndPut(postReceived);
 
     if (!validatedPost) {
         return response.status(400).json({
@@ -83,7 +83,7 @@ function store(request, response) {
 
 function update(request, response) {
     const updateReceived = request.body; // E' una put, quindi mi aspetto di ricevere TUTTI i dati, per modificare quello che già ho con i dati nuovi.
-    const validatedUpdate = validatePost(updateReceived);
+    const validatedUpdate = validatePostAndPut(updateReceived);
     const id = request.params.id;
     const convertedId = Number(id);
     
@@ -128,6 +128,8 @@ function update(request, response) {
 }
 
 function modify(request, response) {
+    const modifications = request.body;
+    validatePatch(modifications);
     response.json({
         error:null,
         result: "Bravo hai fatto una patch"

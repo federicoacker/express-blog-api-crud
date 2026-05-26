@@ -104,7 +104,7 @@ function getCreationTime() {
   return created_atString;
 }
 
-function doPostsHaveSameKeys(...postObjects){ // devo ricordarmi di dare sempre il post di template per quando voglio fare create o put (per il patch no)
+function doPostsHaveSameKeys(...postObjects){ // devo ricordarmi di dare sempre il post di template per quando voglio fare create o put (per il patch non si usa questa)
   const allKeys = postObjects.reduce((keys, post) => {
     const currentKeys = Object.keys(post);
     return keys.concat(currentKeys);
@@ -115,7 +115,7 @@ function doPostsHaveSameKeys(...postObjects){ // devo ricordarmi di dare sempre 
   return postObjects.every(postObject => deDuplicatedKeys.size === Object.keys(postObject).length);
 }
 
-function validatePost(post) {
+function validatePostAndPut(post) {
   if (!post) {
     return null;
   }
@@ -134,56 +134,93 @@ function validatePost(post) {
     return null;
   }
 
+  let result = true;
+
   for (const property of Object.entries(post)) {
-    switch (property[0]) {
-      case "title":
-        if (
-          typeof property[1] !== "string" ||
-          property[1].trim().length === 0
-        ) {
-          return null;
-        }
-        break;
-      case "content":
-        if (
-          typeof property[1] !== "string" ||
-          property[1].trim().length === 0
-        ) {
-          return null;
-        }
-        break;
-      case "image":
-        if (typeof property[1] !== "string") {
-          return null;
-        }
-        break;
-      case "tags":
-        if (!Array.isArray(property[1])) {
-          return null;
-        }
-        for(let i = 0; i<property[1].length; i++){
-          const current = property[1][i];
-          if(typeof current !== "string"){
-            return null;
-          }
-        }
-        break;
-      case "published":
-        if (typeof property[1] !== "boolean") {
-          return null;
-        }
-        break;
-      case "prep_time":
-        if (typeof property[1] !== "number") {
-          return null;
-        }
-        break;
-      default:
-        break;
+    const [key, value] = property;
+
+    result = switchValidator(key, value);
+
+    if(!result){
+      return null;
     }
   }
 
   return post;
+}
+
+function switchValidator(key, value){
+  switch(key){
+    case "title":
+        if (
+          typeof value !== "string" ||
+          value.trim().length === 0
+        ) {
+          return false;
+        }
+        break;
+      case "content":
+        if (
+          typeof value !== "string" ||
+          value.trim().length === 0
+        ) {
+          return false;
+        }
+        break;
+      case "image":
+        if (typeof value !== "string") {
+          return false;
+        }
+        break;
+      case "tags":
+        if (!Array.isArray(value)) {
+          return false;
+        }
+        for(let i = 0; i<value.length; i++){
+          const current = value[i];
+          if(typeof current !== "string"){
+            return false;
+          }
+        }
+        break;
+      case "published":
+        if (typeof value !== "boolean") {
+          return false;
+        }
+        break;
+      case "prep_time":
+        if (typeof value !== "number") {
+          return false;
+        }
+        break;
+      default:
+        break;
+  }
+  return true;
+}
+
+function validatePatch(modification) {
+  const updateKeys = Object.keys(modification);
+  for(let i = 0; i < updateKeys; i++){
+    const currentKey = updateKeys[i];
+    if(!templatePostToBeCreated.hasOwnProperty(currentKey)){
+      return null;
+    }
+  }
+
+  let result = true;
+
+  for(let i = 0; i < updateKeys; i++){
+    const key = updateKeys[i];
+    const value = modification[key];
+
+    result = switchValidator(key, value);
+    if(!result){
+      return null;
+    }
+  }
+
+  return modification;
 }
 
 function filterPosts(query) {
@@ -232,7 +269,8 @@ function filterPosts(query) {
 
 export {
   posts,
-  validatePost,
+  validatePostAndPut,
+  validatePatch,
   filterPosts,
   createPostSlug,
   getCreationTime
