@@ -64,6 +64,15 @@ const posts = [
   },
 ];
 
+const templatePostToBeCreated = {
+  title:"",
+  content:"",
+  image:"",
+  tags:[],
+  published: false,
+  prep_time: 0
+}
+
 function createPostSlug(post){
   if(!post){
     return null;
@@ -95,10 +104,24 @@ function getCreationTime() {
   return created_atString;
 }
 
+function doPostsHaveSameKeys(...postObjects){ // devo ricordarmi di dare sempre il post di template per quando voglio fare create o put (per il patch no)
+  const allKeys = postObjects.reduce((keys, post) => {
+    const currentKeys = Object.keys(post);
+    return keys.concat(currentKeys);
+  }); // Alla fine di tutto questo, avrò un array con dentro tutte le chiavi di tutti i post ricevuti in ingresso
+  // Adesso devo eliminare tutti i duplicati da questo array:
+  const deDuplicatedKeys = new Set(allKeys);
+  // A questo punto, mi basta controllare che la lunghezza del mio set sia uguale alla lunghezza dell'array di chiavi di OGNI oggetto.
+  return postObjects.every(postObject => deDuplicatedKeys.size === Object.keys(postObject).length);
+}
+
 function validatePost(post) {
   if (!post) {
     return null;
   }
+
+
+
   if (
     !post.hasOwnProperty("title") ||
     !post.hasOwnProperty("content") ||
