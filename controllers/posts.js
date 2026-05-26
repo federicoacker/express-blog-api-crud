@@ -129,10 +129,47 @@ function update(request, response) {
 
 function modify(request, response) {
     const modifications = request.body;
-    validatePatch(modifications);
+    const validatedModifications = validatePatch(modifications);
+
+    if(!validatedModifications){
+        return response.status(400).json({
+            error:"Oggetto invalido passato al server",
+            result: []
+        })
+    }
+
+    const id = request.params.id;
+    const convertedId = Number(id);
+    if (isNaN(convertedId) || convertedId < 0) {
+        return response.status(400).json({
+            error: "L'id inserito non è in un formato valido",
+            result: []
+        });
+    }
+    
+    const foundPostIndex = posts.findIndex(post => post.id === convertedId);
+
+    if (foundPostIndex === -1) {
+        return response.status(404).json({
+            error: "Non abbiamo trovato nessun post con quell'id",
+            result: []
+        })
+    }
+    
+    
+    const newPost = ({
+        ...posts[foundPostIndex],
+        ...validatedModifications,
+        created_at: getCreationTime()
+    })
+
+    newPost.slug = createPostSlug(newPost);
+
+    posts.splice(foundPostIndex, 1, newPost);
+
     response.json({
         error:null,
-        result: "Bravo hai fatto una patch"
+        result: newPost
     })
 }
 
