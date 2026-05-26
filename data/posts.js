@@ -87,8 +87,13 @@ function createPostSlug(post){
 
   do{
 
-    slugFinal = slug + (increment==0 ? "" : `-${increment}`);
-    
+    if(increment < 10){
+      slugFinal = slug + (increment === 0 ? "" : `-${increment}`);
+    }
+    else{
+      slugFinal = slug + crypto.randomUUID();
+    }
+
     foundDuplicateSlug = posts.find(post => post.slug === slugFinal);
 
     increment++;
@@ -104,7 +109,8 @@ function getCreationTime() {
   return created_atString;
 }
 
-function doPostsHaveSameKeys(...postObjects){ // devo ricordarmi di dare sempre il post di template per quando voglio fare create o put (per il patch non si usa questa)
+function doPostsHaveSameKeys(...postObjects){ // devo ricordarmi di dare sempre il post di template 
+// per quando voglio fare create o put (per il patch non si usa questa)
   const allKeys = postObjects.reduce((keys, post) => {
     const currentKeys = Object.keys(post);
     return keys.concat(currentKeys);
@@ -121,16 +127,6 @@ function validatePostAndPut(post) {
   }
 
   if (!doPostsHaveSameKeys(post, templatePostToBeCreated)){
-    return null;
-  }
-
-  if (
-    !post.hasOwnProperty("title") ||
-    !post.hasOwnProperty("content") ||
-    !post.hasOwnProperty("image") ||
-    !post.hasOwnProperty("tags") ||
-    !post.hasOwnProperty("published") ||
-    !post.hasOwnProperty("prep_time") ) {
     return null;
   }
 
