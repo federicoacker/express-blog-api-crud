@@ -1,4 +1,4 @@
-import { posts, validatePost, filterPosts } from "../data/posts.js";
+import { posts, validatePost, filterPosts, createPostSlug, getCreationTime } from "../data/posts.js";
 
 const postsController = {
     index,
@@ -65,19 +65,24 @@ function store(request, response) {
         })
     }
 
-    posts.push({
+    const newPost = ({
         ...validatedPost,
         id: posts.length + 1,
-        slug:
+        created_at: getCreationTime()
     });
+
+    newPost.slug = createPostSlug(newPost);
+
+    posts.push(newPost);
 
     response.status(201).json({
         error: null,
-        result: validatedPost
+        result: newPost
     })
 }
 
 function update(request, response) {
+    const updateReceived = request.body;
     response.json({
         error:null,
         result: "Bravo hai fatto una put"

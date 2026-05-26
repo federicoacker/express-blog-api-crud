@@ -89,6 +89,12 @@ function createPostSlug(post){
   return slugFinal;
 }
 
+function getCreationTime() {
+  const currentTime = new Date();
+  const created_atString = `${currentTime.toISOString()}`;
+  return created_atString;
+}
+
 function validatePost(post) {
   if (!post) {
     return null;
@@ -156,10 +162,11 @@ function validatePost(post) {
 }
 
 function filterPosts(query) {
-  const { title, tags, slug, prep_time, published } = query;
+  const { title, tags, slug, prep_time, published } = query || {};
 
   const filteredPosts = posts.filter(post => {
-    if (!published){
+    console.log(published);
+    if (typeof published === "boolean" && !published){
       return false;
     }
     if (title) {
@@ -201,5 +208,7 @@ function filterPosts(query) {
 export {
   posts,
   validatePost,
-  filterPosts
+  filterPosts,
+  createPostSlug,
+  getCreationTime
 }
