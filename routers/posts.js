@@ -8,14 +8,14 @@ postsRouter.use(express.json());
 
 postsRouter.get("/", postsController.index);
 
-postsRouter.get("/:id", postsController.show);
+postsRouter.get("/:slug", postsController.show);
 
 postsRouter.post("/", postsController.store);
 
-postsRouter.put("/:id", postsController.update);
+postsRouter.put("/:slug", postsController.update);
 
-postsRouter.patch("/:id", postsController.modify);
+postsRouter.patch("/:slug", postsController.modify);
 
-postsRouter.delete("/:id", postsController.destroy);
+postsRouter.delete("/:slug", postsController.destroy);
 
 export default postsRouter;

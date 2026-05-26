@@ -21,35 +21,33 @@ function index(request, response) {
     response.json(
         {
             error: null,
-            result: filteredPosts
+            result: filteredPosts.map(post => {
+                const {id, created_at, ...remaining} = post;
+                return remaining;
+            })
         }
     )
 
 }
 
 function show(request, response) {
-    const id = request.params.id;
-    const convertedId = parseInt(id);
+    const slug = request.params.slug;
 
-    if (isNaN(convertedId) || convertedId < 0) {
-        return response.status(400).json({
-            error: "L'id inserito non è in un formato valido",
-            result: []
-        });
-    }
 
-    const foundPost = posts.find(post => post.id === convertedId);
+    const foundPost = posts.find(post => post.slug === slug);
 
     if (!foundPost) {
         return response.status(404).json({
-            error: "Non abbiamo trovato nessun post con quell'id",
+            error: "Non abbiamo trovato nessun post con quello slug",
             result: []
         })
     }
 
+    const {id, created_at, ...remaining} = foundPost;
+
     response.json({
         error: null,
-        result: foundPost
+        result: remaining
     })
 
 }
@@ -84,8 +82,7 @@ function store(request, response) {
 function update(request, response) {
     const updateReceived = request.body; // E' una put, quindi mi aspetto di ricevere TUTTI i dati, per modificare quello che già ho con i dati nuovi.
     const validatedUpdate = validatePostAndPut(updateReceived);
-    const id = request.params.id;
-    const convertedId = Number(id);
+    const slug = request.params.slug;
     
     if(!validatedUpdate){
     return response.status(400).json({
@@ -94,14 +91,8 @@ function update(request, response) {
         })
     }
 
-    if (isNaN(convertedId) || convertedId < 0) {
-        return response.status(400).json({
-            error: "L'id inserito non è in un formato valido",
-            result: []
-        });
-    }
     
-    const foundPostIndex = posts.findIndex(post => post.id === convertedId);
+    const foundPostIndex = posts.findIndex(post => post.slug === slug);
 
     if (foundPostIndex === -1) {
         return response.status(404).json({
@@ -121,9 +112,11 @@ function update(request, response) {
 
     posts.splice(foundPostIndex, 1 , newPost);
 
+    const {id, created_at, ...remaining} = newPost;
+
     response.json({
         error:null,
-        result: newPost
+        result: remaining
     })
 }
 
@@ -138,16 +131,9 @@ function modify(request, response) {
         })
     }
 
-    const id = request.params.id;
-    const convertedId = Number(id);
-    if (isNaN(convertedId) || convertedId < 0) {
-        return response.status(400).json({
-            error: "L'id inserito non è in un formato valido",
-            result: []
-        });
-    }
+    const slug = request.params.slug;
     
-    const foundPostIndex = posts.findIndex(post => post.id === convertedId);
+    const foundPostIndex = posts.findIndex(post => post.slug === slug);
 
     if (foundPostIndex === -1) {
         return response.status(404).json({
@@ -167,24 +153,19 @@ function modify(request, response) {
 
     posts.splice(foundPostIndex, 1, newPost);
 
+    const {id, created_at, ...remaining} = newPost;
+
     response.json({
         error:null,
-        result: newPost
+        result: remaining
     })
 }
 
 function destroy(request, response) {
 
-    const idReal = Number(request.params.id);
+    const slug = request.params.slug;
 
-    if(isNaN(idReal) || idReal <= 0){
-        return response.status(400).json({
-            error:"L'id inserito non è nel formato corretto. Deve essere un numero intero positivo",
-            result: null
-        });
-    }
-
-    const postIndex = posts.findIndex(post => post.id === idReal);
+    const postIndex = posts.findIndex(post => post.slug === slug);
 
     if(postIndex === -1){
         return response.status(404).json({
