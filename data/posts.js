@@ -64,6 +64,31 @@ const posts = [
   },
 ];
 
+function createPostSlug(post){
+  if(!post){
+    return null;
+  }
+
+  const {title} = post;
+  const slug = title.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, "-");
+
+  let increment = 0;
+  let foundDuplicateSlug;
+  let slugFinal = slug;
+
+  do{
+
+    slugFinal = slug + (increment==0 ? "" : `-${increment}`);
+    
+    foundDuplicateSlug = posts.find(post => post.slug === slugFinal);
+
+    increment++;
+
+  }while(foundDuplicateSlug)
+
+  return slugFinal;
+}
+
 function validatePost(post) {
   if (!post) {
     return null;
@@ -73,10 +98,8 @@ function validatePost(post) {
     !post.hasOwnProperty("content") ||
     !post.hasOwnProperty("image") ||
     !post.hasOwnProperty("tags") ||
-    !post.hasOwnProperty("slug") ||
     !post.hasOwnProperty("published") ||
-    !post.hasOwnProperty("prep_time") ||
-    !post.hasOwnProperty("created_at")) {
+    !post.hasOwnProperty("prep_time") ) {
     return null;
   }
 
@@ -107,10 +130,11 @@ function validatePost(post) {
         if (!Array.isArray(property[1])) {
           return null;
         }
-        break;
-      case "slug":
-        if (typeof property[1] !== "string") {
-          return null;
+        for(let i = 0; i<property[1].length; i++){
+          const current = property[1][i];
+          if(typeof current !== "string"){
+            return null;
+          }
         }
         break;
       case "published":
@@ -123,14 +147,7 @@ function validatePost(post) {
           return null;
         }
         break;
-      case "created_at":
-        if (
-          typeof property[1] !== "string" ||
-          property[1].trim().length === 0 ||
-          isNaN(Date.parse(property[1]))
-        ) {
-          return null;
-        }
+      default:
         break;
     }
   }
@@ -139,9 +156,12 @@ function validatePost(post) {
 }
 
 function filterPosts(query) {
-  const { title, tags, slug, prep_time } = query;
+  const { title, tags, slug, prep_time, published } = query;
 
   const filteredPosts = posts.filter(post => {
+    if (!published){
+      return false;
+    }
     if (title) {
       const postTitle = post.title.toLowerCase();
       const searchTitle = title.toLowerCase();
