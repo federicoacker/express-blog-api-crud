@@ -65,32 +65,32 @@ const posts = [
 ];
 
 const templatePostToBeCreated = {
-  title:"",
-  content:"",
-  image:"",
-  tags:[],
+  title: "",
+  content: "",
+  image: "",
+  tags: [],
   published: false,
   prep_time: 0
 }
 
-function createPostSlug(post){
-  if(!post){
+function createPostSlug(post) {
+  if (!post) {
     return null;
   }
 
-  const {title} = post;
+  const { title } = post;
   const slug = title.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, "-");
 
   let increment = 0;
   let foundDuplicateSlug;
   let slugFinal = slug;
 
-  do{
+  do {
 
-    if(increment < 10){
+    if (increment < 10) {
       slugFinal = slug + (increment === 0 ? "" : `-${increment}`);
     }
-    else{
+    else {
       slugFinal = slug + crypto.randomUUID();
     }
 
@@ -98,7 +98,7 @@ function createPostSlug(post){
 
     increment++;
 
-  }while(foundDuplicateSlug)
+  } while (foundDuplicateSlug)
 
   return slugFinal;
 }
@@ -109,8 +109,8 @@ function getCreationTime() {
   return created_atString;
 }
 
-function doPostsHaveSameKeys(...postObjects){ // devo ricordarmi di dare sempre il post di template 
-// per quando voglio fare create o put (per il patch non si usa questa)
+function doPostsHaveSameKeys(...postObjects) { // devo ricordarmi di dare sempre il post di template 
+  // per quando voglio fare create o put (per il patch non si usa questa)
   const allKeys = postObjects.reduce((keys, post) => {
     const currentKeys = Object.keys(post);
     return keys.concat(currentKeys);
@@ -126,7 +126,7 @@ function validatePostAndPut(post) {
     return null;
   }
 
-  if (!doPostsHaveSameKeys(post, templatePostToBeCreated)){
+  if (!doPostsHaveSameKeys(post, templatePostToBeCreated)) {
     return null;
   }
 
@@ -137,7 +137,7 @@ function validatePostAndPut(post) {
 
     result = switchValidator(key, value);
 
-    if(!result){
+    if (!result) {
       return null;
     }
   }
@@ -145,73 +145,76 @@ function validatePostAndPut(post) {
   return post;
 }
 
-function switchValidator(key, value){
-  switch(key){
+function switchValidator(key, value) {
+  switch (key) {
     case "title":
-        if (
-          typeof value !== "string" ||
-          value.trim().length === 0
-        ) {
+      if (
+        typeof value !== "string" ||
+        value.trim().length === 0
+      ) {
+        return false;
+      }
+      break;
+    case "content":
+      if (
+        typeof value !== "string" ||
+        value.trim().length === 0
+      ) {
+        return false;
+      }
+      break;
+    case "image":
+      if (typeof value !== "string") {
+        return false;
+      }
+      break;
+    case "tags":
+      if (!Array.isArray(value)) {
+        return false;
+      }
+      for (let i = 0; i < value.length; i++) {
+        const current = value[i];
+        if (typeof current !== "string") {
           return false;
         }
-        break;
-      case "content":
-        if (
-          typeof value !== "string" ||
-          value.trim().length === 0
-        ) {
-          return false;
-        }
-        break;
-      case "image":
-        if (typeof value !== "string") {
-          return false;
-        }
-        break;
-      case "tags":
-        if (!Array.isArray(value)) {
-          return false;
-        }
-        for(let i = 0; i<value.length; i++){
-          const current = value[i];
-          if(typeof current !== "string"){
-            return false;
-          }
-        }
-        break;
-      case "published":
-        if (typeof value !== "boolean") {
-          return false;
-        }
-        break;
-      case "prep_time":
-        if (typeof value !== "number") {
-          return false;
-        }
-        break;
-      default:
-        break;
+      }
+      break;
+    case "published":
+      if (typeof value !== "boolean") {
+        return false;
+      }
+      break;
+    case "prep_time":
+      if (typeof value !== "number") {
+        return false;
+      }
+      break;
+    default:
+      break;
   }
   return true;
 }
 
 function validatePatch(modification) {
+  if(!modification){
+    return null;
+  }
   const updateKeys = Object.keys(modification);
-  for(let i = 0; i < updateKeys; i++){
+  for (let i = 0; i < updateKeys; i++) {
     const currentKey = updateKeys[i];
-    if(!templatePostToBeCreated.hasOwnProperty(currentKey)){
+    if (!templatePostToBeCreated.hasOwnProperty(currentKey)) {
       return null;
     }
   }
 
   let result = true;
 
-  for(let i = 0; i < updateKeys; i++){
+  for (let i = 0; i < updateKeys; i++) {
     const key = updateKeys[i];
     const value = modification[key];
 
     result = switchValidator(key, value);
-    if(!result){
+    if (!result) {
       return null;
     }
   }
@@ -224,7 +227,7 @@ function filterPosts(query) {
 
   const filteredPosts = posts.filter(post => {
     console.log(published);
-    if (typeof published === "boolean" && !published){
+    if (typeof published === "boolean" && !published) {
       return false;
     }
     if (title) {
