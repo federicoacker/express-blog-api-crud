@@ -31,17 +31,7 @@ function index(request, response) {
 }
 
 function show(request, response) {
-    const slug = request.params.slug;
-
-
-    const foundPost = posts.find(post => post.slug === slug);
-
-    if (!foundPost) {
-        return response.status(404).json({
-            error: "Non abbiamo trovato nessun post con quello slug",
-            result: []
-        })
-    }
+    const foundPost = request.foundPost;
 
     const {id, created_at, ...remaining} = foundPost;
 
@@ -72,19 +62,8 @@ function store(request, response) {
 }
 
 function update(request, response) {
-    const updateReceived = request.validatedPost;
-    console.log(updateReceived); // E' una put, quindi mi aspetto di ricevere TUTTI i dati, per modificare quello che già ho con i dati nuovi.
-    const slug = request.params.slug;
-    console.log(slug);
-    const foundPostIndex = posts.findIndex(post => post.slug === slug);
-    console.log(foundPostIndex);
-    if (foundPostIndex === -1) {
-        return response.status(404).json({
-            error: "Non abbiamo trovato nessun post con quell'id",
-            result: []
-        })
-    }
-    
+    const updateReceived = request.validatedPost; // E' una put, quindi mi aspetto di ricevere TUTTI i dati, per modificare quello che già ho con i dati nuovi.
+    const foundPostIndex = request.foundPostIndex;
     
     const newPost = ({
         ...posts[foundPostIndex],
@@ -106,16 +85,7 @@ function update(request, response) {
 
 function modify(request, response) {
     const modifications = request.validatedModifications;
-    const slug = request.params.slug;
-    
-    const foundPostIndex = posts.findIndex(post => post.slug === slug);
-
-    if (foundPostIndex === -1) {
-        return response.status(404).json({
-            error: "Non abbiamo trovato nessun post con quell'id",
-            result: []
-        })
-    }
+    const foundPostIndex = request.foundPostIndex;
     
     const newPost = ({
         ...posts[foundPostIndex],
@@ -136,19 +106,8 @@ function modify(request, response) {
 }
 
 function destroy(request, response) {
-
-    const slug = request.params.slug;
-
-    const postIndex = posts.findIndex(post => post.slug === slug);
-
-    if(postIndex === -1){
-        return response.status(404).json({
-            error: "Non ci sono post con quell'id",
-            result: null
-        })
-    }
-
-    posts.splice(postIndex, 1);
+    const foundPostIndex = request.foundPostIndex
+    posts.splice(foundPostIndex, 1);
     response.sendStatus(204);
 }
 
