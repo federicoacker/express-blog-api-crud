@@ -53,16 +53,8 @@ function show(request, response) {
 }
 
 function store(request, response) {
-    const postReceived = request.body;
-    const validatedPost = validatePostAndPut(postReceived);
 
-    if (!validatedPost) {
-        return response.status(400).json({
-            error: "Oggetto invalido passato al server",
-            result: []
-        })
-    }
-
+    const validatedPost = request.validatedPost;
     const newPost = ({
         ...validatedPost,
         id: posts.length + 1,

@@ -226,7 +226,6 @@ function filterPosts(query) {
   const { title, tags, slug, prep_time, published } = query || {};
 
   const filteredPosts = posts.filter(post => {
-    console.log(published);
     if (typeof published === "boolean" && !published) {
       return false;
     }
