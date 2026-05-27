@@ -1,12 +1,12 @@
 ```mermaid
 flowchart TD
-A[GET/posts] --> |postsRouter| routers/posts.js --> |router.get| C[index_function] --> |posts controller| D[index] --> |data/posts.js| show_all_posts
+A[GET/posts] --> |postsRouter| routers/posts.js --> |router.get| C[index_function] --> |posts controller| D[index] --> |data/posts.js| B[show_all_posts]
 linkStyle 0 stroke:#95DEB9
 linkStyle 1 stroke:#95DEB9
 linkStyle 2 stroke:#95DEB9
 linkStyle 3 stroke:#95DEB9
 
-E[GET/posts/:slug] --> |postsRouter| routers/posts.js --> |fetchPost Middleware| middlewares/fetchpost.js --> |next| H[show_function] --> |posts controller| I[show] --> |data/posts.js| J[show_single_post]
+E[GET/posts/:slug] --> |postsRouter| routers/posts.js --> |fetchPost middleware| middlewares/fetchpost.js --> |next| H[show_function] --> |posts controller| I[show] --> |data/posts.js| J[show_single_post]
 linkStyle 4 stroke:#31543F
 linkStyle 5 stroke:#31543F
 linkStyle 6 stroke:#31543F
