@@ -1,5 +1,6 @@
 import express from "express";
 import postsRouter from "./routers/posts.js";
+import errorHandler from "./middlewares/errorHandler.js";
 
 const app = express();
 const SERVER_URL = process.env.SERVER_URL;
@@ -9,7 +10,7 @@ app.use("/posts", postsRouter)
 app.use(express.static("public"));
 
 
-
+app.use(errorHandler);
 
 app.listen(SERVER_PORT, (error)=>{
     if(error){

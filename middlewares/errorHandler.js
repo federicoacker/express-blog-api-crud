@@ -5,3 +5,5 @@ function errorHandler ( error, request, response, next) {
         result: null
     });
 }
+
+export default errorHandler;
