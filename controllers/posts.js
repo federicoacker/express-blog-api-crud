@@ -72,20 +72,12 @@ function store(request, response) {
 }
 
 function update(request, response) {
-    const updateReceived = request.body; // E' una put, quindi mi aspetto di ricevere TUTTI i dati, per modificare quello che già ho con i dati nuovi.
-    const validatedUpdate = validatePostAndPut(updateReceived);
+    const updateReceived = request.validatedPost;
+    console.log(updateReceived); // E' una put, quindi mi aspetto di ricevere TUTTI i dati, per modificare quello che già ho con i dati nuovi.
     const slug = request.params.slug;
-    
-    if(!validatedUpdate){
-    return response.status(400).json({
-            error:"Oggetto invalido passato al server per la PUT, non è che volevi fare la PATCH?",
-            result: []
-        })
-    }
-
-    
+    console.log(slug);
     const foundPostIndex = posts.findIndex(post => post.slug === slug);
-
+    console.log(foundPostIndex);
     if (foundPostIndex === -1) {
         return response.status(404).json({
             error: "Non abbiamo trovato nessun post con quell'id",
@@ -96,7 +88,7 @@ function update(request, response) {
     
     const newPost = ({
         ...posts[foundPostIndex],
-        ...validatedUpdate,
+        ...updateReceived,
         created_at: getCreationTime()
     })
 
@@ -113,16 +105,7 @@ function update(request, response) {
 }
 
 function modify(request, response) {
-    const modifications = request.body;
-    const validatedModifications = validatePatch(modifications);
-
-    if(!validatedModifications){
-        return response.status(400).json({
-            error:"Oggetto invalido passato al server",
-            result: []
-        })
-    }
-
+    const modifications = request.validatedModifications;
     const slug = request.params.slug;
     
     const foundPostIndex = posts.findIndex(post => post.slug === slug);
@@ -134,10 +117,9 @@ function modify(request, response) {
         })
     }
     
-    
     const newPost = ({
         ...posts[foundPostIndex],
-        ...validatedModifications,
+        ...modifications,
         created_at: getCreationTime()
     })
 
